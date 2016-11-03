@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: k8s-signal-logger
+  labels:
+    app: k8s-signal-logger
+  name: k8s-signal-logger
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: k8s-signal-logger
+  strategy:
+    rollingUpdate:
+      maxSurge: "50%"
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        description: k8s-signal-logger
+      labels:
+        app: k8s-signal-logger
+        server: web
+      name: k8s-signal-logger
+    spec:
+      containers:
+      - name: k8s-signal-logger
+        image: micahhausler/k8s-signal-logger
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 4
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 1
+          httpGet:
+            path: /ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      dnsPolicy: Default
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
