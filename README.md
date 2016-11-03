@@ -9,6 +9,9 @@ There are 3 endpoints to the container:
 - `/ready` - Used for the readiness check
 - `/` - A homepage handler - always responds with `200`
 
+If a `SIGTERM` is sent by Kubernetes, the signal is logged to STDOUT and ignored. This way, you can see
+if/how much traffic is still being sent to the pod once it is supposed to be in a 'shutdown' mode.
+
 ## Try it out
 
 The following commands run:
